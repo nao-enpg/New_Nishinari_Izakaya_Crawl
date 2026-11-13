@@ -10,8 +10,8 @@
 - Cloudflare Workers（有料プラン）+ D1（`--location apac`）
 - Prisma 7.10.1（`prisma-client` ジェネレータ、`runtime = "cloudflare"`、`@prisma/adapter-d1`）
 - 認証: Firebase Authentication（Google ログインのみ）+ `jose` によるサーバー側検証 + 自前セッション（D1）
-- テスト: Vitest 4.1（`@cloudflare/vitest-pool-workers`）+ Playwright
-- パッケージマネージャ: pnpm（npm は vitest-pool-workers の peer 解決でクラッシュするため使わない）
+- テスト: Vitest 5.1（`@cloudflare/vitest-plugin` 1.8。旧名 `vitest-pool-workers` は非推奨）+ Playwright
+- パッケージマネージャ: pnpm（この構成では npm install が peer 解決でクラッシュしたため）
 
 ## 必ず守ること
 

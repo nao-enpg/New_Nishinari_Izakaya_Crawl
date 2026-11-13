@@ -41,7 +41,8 @@
 | prisma / @prisma/client / @prisma/adapter-d1 | 7.10.1 | `prisma` の latest タグは 8.0 RC を指している。`@prisma/client` 側は版のずれを警告しないので、CI で一致を確認する |
 | firebase（ブラウザ側） | 13.x | |
 | jose | 6.x | |
-| vitest | 4.1.x | Workers 上でテストを動かす `@cloudflare/vitest-pool-workers` が Vitest 5 に未対応のため |
+| vitest / @cloudflare/vitest-plugin | 5.1.0 / 1.8.2 | 旧名の `@cloudflare/vitest-pool-workers` は非推奨。後継の `vitest-plugin` は Vitest 5 に対応（P1 の技術検証で確認） |
+| パッケージマネージャ | pnpm 10.28 | npm 10.9 はこの依存関係でインストール中にクラッシュした |
 | @playwright/test | 1.65.x | |
 | specify-cli | 1.4.0 | |
 
