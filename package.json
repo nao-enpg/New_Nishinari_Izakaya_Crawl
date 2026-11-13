@@ -9,7 +9,10 @@
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && vite preview",
     "cf-typegen": "wrangler types",
-    "postinstall": "wrangler types"
+    "postinstall": "wrangler types",
+    "test": "vitest run",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-d1": "7.10.1",

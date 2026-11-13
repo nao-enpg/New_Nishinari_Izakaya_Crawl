@@ -1,38 +1,50 @@
 /**
- * For more details on how to configure Wrangler, refer to:
+ * Wrangler 設定
  * https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * - D1 の database_id は P0 で Cloudflare に D1 を作成したら差し替える（--location apac で作成）
+ * - 本番・staging は env で分ける。ルート／カスタムドメインの付け替えは手作業（P7 の手順書）
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "nishinari-next",
 	"compatibility_date": "2026-11-13",
+	"compatibility_flags": ["nodejs_compat"],
 	"main": "./workers/app.ts",
-	"vars": {
-		"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
-	},
 	"observability": {
 		"enabled": true
 	},
-	"upload_source_maps": true
-	/**
-	 * Smart Placement
-	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
-	 */
-	// "placement": {  "mode": "smart" }
-	/**
-	 * Bindings
-	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
-	 * databases, object storage, AI inference, real-time communication and more.
-	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
-	 */
-	/**
-	 * Static Assets
-	 * https://developers.cloudflare.com/workers/static-assets/binding/
-	 */
-	// "assets": {  "directory": "./public/",  "binding": "ASSETS" }
-	/**
-	 * Service Bindings (communicate between multiple Workers)
-	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
-	 */
-	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
+	"upload_source_maps": true,
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "nishinari-local",
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "migrations"
+		}
+	],
+	"env": {
+		"staging": {
+			"name": "nishinari-next-staging",
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "nishinari-staging",
+					"database_id": "TBD-staging",
+					"migrations_dir": "migrations"
+				}
+			]
+		},
+		"production": {
+			"name": "nishinari-next",
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "nishinari-production",
+					"database_id": "TBD-production",
+					"migrations_dir": "migrations"
+				}
+			]
+		}
+	}
 }
