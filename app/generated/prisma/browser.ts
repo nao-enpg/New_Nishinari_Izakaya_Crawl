@@ -18,7 +18,37 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
+ * Model Izakaya
+ * 
+ */
+export type Izakaya = Prisma.IzakayaModel
+/**
  * Model Tag
  * 
  */
 export type Tag = Prisma.TagModel
+/**
+ * Model IzakayaTag
+ * 
+ */
+export type IzakayaTag = Prisma.IzakayaTagModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model Plan
+ * 
+ */
+export type Plan = Prisma.PlanModel
+/**
+ * Model IzakayaPlan
+ * 
+ */
+export type IzakayaPlan = Prisma.IzakayaPlanModel
+/**
+ * Model Favorite
+ * 
+ */
+export type Favorite = Prisma.FavoriteModel

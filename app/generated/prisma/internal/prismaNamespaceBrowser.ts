@@ -51,7 +51,13 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Tag: 'Tag'
+  Izakaya: 'Izakaya',
+  Tag: 'Tag',
+  IzakayaTag: 'IzakayaTag',
+  User: 'User',
+  Plan: 'Plan',
+  IzakayaPlan: 'IzakayaPlan',
+  Favorite: 'Favorite'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -67,12 +73,85 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const IzakayaScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  placeId: 'placeId',
+  sortOrder: 'sortOrder',
+  hidden: 'hidden',
+  lat: 'lat',
+  lng: 'lng',
+  coordsFetchedAt: 'coordsFetchedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IzakayaScalarFieldEnum = (typeof IzakayaScalarFieldEnum)[keyof typeof IzakayaScalarFieldEnum]
+
+
 export const TagScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  sortOrder: 'sortOrder'
 } as const
 
 export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
+export const IzakayaTagScalarFieldEnum = {
+  izakayaId: 'izakayaId',
+  tagId: 'tagId'
+} as const
+
+export type IzakayaTagScalarFieldEnum = (typeof IzakayaTagScalarFieldEnum)[keyof typeof IzakayaTagScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  firebaseUid: 'firebaseUid',
+  googleSub: 'googleSub',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PlanScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  isPublic: 'isPublic',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
+
+
+export const IzakayaPlanScalarFieldEnum = {
+  id: 'id',
+  planId: 'planId',
+  izakayaId: 'izakayaId',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IzakayaPlanScalarFieldEnum = (typeof IzakayaPlanScalarFieldEnum)[keyof typeof IzakayaPlanScalarFieldEnum]
+
+
+export const FavoriteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  izakayaId: 'izakayaId',
+  createdAt: 'createdAt'
+} as const
+
+export type FavoriteScalarFieldEnum = (typeof FavoriteScalarFieldEnum)[keyof typeof FavoriteScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -81,4 +160,12 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

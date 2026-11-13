@@ -28,8 +28,8 @@ export * from "./enums.js"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Tags
- * const tags = await prisma.tag.findMany()
+ * // Fetch zero or more Izakayas
+ * const izakayas = await prisma.izakaya.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -39,7 +39,37 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
+ * Model Izakaya
+ * 
+ */
+export type Izakaya = Prisma.IzakayaModel
+/**
  * Model Tag
  * 
  */
 export type Tag = Prisma.TagModel
+/**
+ * Model IzakayaTag
+ * 
+ */
+export type IzakayaTag = Prisma.IzakayaTagModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model Plan
+ * 
+ */
+export type Plan = Prisma.PlanModel
+/**
+ * Model IzakayaPlan
+ * 
+ */
+export type IzakayaPlan = Prisma.IzakayaPlanModel
+/**
+ * Model Favorite
+ * 
+ */
+export type Favorite = Prisma.FavoriteModel

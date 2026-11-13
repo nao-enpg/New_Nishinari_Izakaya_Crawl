@@ -8,7 +8,96 @@ datasource db {
   provider = "sqlite"
 }
 
+model Izakaya {
+  id              Int           @id @default(autoincrement())
+  name            String
+  description     String?
+  placeId         String?       @unique @map("place_id")
+  sortOrder       Int           @default(0) @map("sort_order")
+  hidden          Boolean       @default(false)
+  lat             Float?
+  lng             Float?
+  coordsFetchedAt DateTime?     @map("coords_fetched_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  tags            IzakayaTag[]
+  favorites       Favorite[]
+  planItems       IzakayaPlan[]
+
+  @@map("izakayas")
+}
+
 model Tag {
-  id   Int    @id @default(autoincrement())
-  name String
+  id        Int          @id @default(autoincrement())
+  name      String
+  sortOrder Int          @default(0) @map("sort_order")
+  izakayas  IzakayaTag[]
+
+  @@map("tags")
+}
+
+model IzakayaTag {
+  izakayaId Int     @map("izakaya_id")
+  tagId     Int     @map("tag_id")
+  izakaya   Izakaya @relation(fields: [izakayaId], references: [id])
+  tag       Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([izakayaId, tagId])
+  @@index([tagId])
+  @@map("izakaya_tags")
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  name        String
+  firebaseUid String?    @unique @map("firebase_uid")
+  googleSub   String?    @unique @map("google_sub")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  plans       Plan[]
+  favorites   Favorite[]
+
+  @@map("users")
+}
+
+model Plan {
+  id          Int           @id @default(autoincrement())
+  userId      Int           @map("user_id")
+  name        String?
+  isPublic    Boolean       @default(false) @map("public")
+  description String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  user        User          @relation(fields: [userId], references: [id])
+  items       IzakayaPlan[]
+
+  @@index([userId])
+  @@map("plans")
+}
+
+model IzakayaPlan {
+  id        Int      @id @default(autoincrement())
+  planId    Int      @map("plan_id")
+  izakayaId Int      @map("izakaya_id")
+  position  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  plan      Plan     @relation(fields: [planId], references: [id])
+  izakaya   Izakaya  @relation(fields: [izakayaId], references: [id])
+
+  @@index([planId, position])
+  @@map("izakaya_plans")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  izakayaId Int      @map("izakaya_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+  izakaya   Izakaya  @relation(fields: [izakayaId], references: [id])
+
+  @@unique([userId, izakayaId])
+  @@index([izakayaId])
+  @@map("favorites")
 }

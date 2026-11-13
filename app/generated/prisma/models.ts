@@ -8,5 +8,11 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Izakaya.js'
 export type * from './models/Tag.js'
+export type * from './models/IzakayaTag.js'
+export type * from './models/User.js'
+export type * from './models/Plan.js'
+export type * from './models/IzakayaPlan.js'
+export type * from './models/Favorite.js'
 export type * from './commonInputTypes.js'

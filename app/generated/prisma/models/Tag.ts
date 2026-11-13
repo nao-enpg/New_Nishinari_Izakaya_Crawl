@@ -28,50 +28,60 @@ export type AggregateTag = {
 
 export type TagAvgAggregateOutputType = {
   id: number | null
+  sortOrder: number | null
 }
 
 export type TagSumAggregateOutputType = {
   id: number | null
+  sortOrder: number | null
 }
 
 export type TagMinAggregateOutputType = {
   id: number | null
   name: string | null
+  sortOrder: number | null
 }
 
 export type TagMaxAggregateOutputType = {
   id: number | null
   name: string | null
+  sortOrder: number | null
 }
 
 export type TagCountAggregateOutputType = {
   id: number
   name: number
+  sortOrder: number
   _all: number
 }
 
 
 export type TagAvgAggregateInputType = {
   id?: true
+  sortOrder?: true
 }
 
 export type TagSumAggregateInputType = {
   id?: true
+  sortOrder?: true
 }
 
 export type TagMinAggregateInputType = {
   id?: true
   name?: true
+  sortOrder?: true
 }
 
 export type TagMaxAggregateInputType = {
   id?: true
   name?: true
+  sortOrder?: true
 }
 
 export type TagCountAggregateInputType = {
   id?: true
   name?: true
+  sortOrder?: true
   _all?: true
 }
 
@@ -164,6 +174,7 @@ export type TagGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type TagGroupByOutputType = {
   id: number
   name: string
+  sortOrder: number
   _count: TagCountAggregateOutputType | null
   _avg: TagAvgAggregateOutputType | null
   _sum: TagSumAggregateOutputType | null
@@ -192,11 +203,15 @@ export type TagWhereInput = {
   NOT?: Prisma.TagWhereInput | Prisma.TagWhereInput[]
   id?: Prisma.IntFilter<"Tag"> | number
   name?: Prisma.StringFilter<"Tag"> | string
+  sortOrder?: Prisma.IntFilter<"Tag"> | number
+  izakayas?: Prisma.IzakayaTagListRelationFilter
 }
 
 export type TagOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
+  izakayas?: Prisma.IzakayaTagOrderByRelationAggregateInput
 }
 
 export type TagWhereUniqueInput = Prisma.AtLeast<{
@@ -205,11 +220,14 @@ export type TagWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TagWhereInput[]
   NOT?: Prisma.TagWhereInput | Prisma.TagWhereInput[]
   name?: Prisma.StringFilter<"Tag"> | string
+  sortOrder?: Prisma.IntFilter<"Tag"> | number
+  izakayas?: Prisma.IzakayaTagListRelationFilter
 }, "id">
 
 export type TagOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   _count?: Prisma.TagCountOrderByAggregateInput
   _avg?: Prisma.TagAvgOrderByAggregateInput
   _max?: Prisma.TagMaxOrderByAggregateInput
@@ -223,105 +241,211 @@ export type TagScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TagScalarWhereWithAggregatesInput | Prisma.TagScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Tag"> | number
   name?: Prisma.StringWithAggregatesFilter<"Tag"> | string
+  sortOrder?: Prisma.IntWithAggregatesFilter<"Tag"> | number
 }
 
 export type TagCreateInput = {
   name: string
+  sortOrder?: number
+  izakayas?: Prisma.IzakayaTagCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateInput = {
   id?: number
   name: string
+  sortOrder?: number
+  izakayas?: Prisma.IzakayaTagUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  izakayas?: Prisma.IzakayaTagUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  izakayas?: Prisma.IzakayaTagUncheckedUpdateManyWithoutTagNestedInput
 }
 
 export type TagCreateManyInput = {
   id?: number
   name: string
+  sortOrder?: number
 }
 
 export type TagUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TagUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TagCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type TagAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type TagMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type TagMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type TagSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type TagScalarRelationFilter = {
+  is?: Prisma.TagWhereInput
+  isNot?: Prisma.TagWhereInput
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type TagCreateNestedOneWithoutIzakayasInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutIzakayasInput, Prisma.TagUncheckedCreateWithoutIzakayasInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutIzakayasInput
+  connect?: Prisma.TagWhereUniqueInput
 }
 
+export type TagUpdateOneRequiredWithoutIzakayasNestedInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutIzakayasInput, Prisma.TagUncheckedCreateWithoutIzakayasInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutIzakayasInput
+  upsert?: Prisma.TagUpsertWithoutIzakayasInput
+  connect?: Prisma.TagWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TagUpdateToOneWithWhereWithoutIzakayasInput, Prisma.TagUpdateWithoutIzakayasInput>, Prisma.TagUncheckedUpdateWithoutIzakayasInput>
+}
+
+export type TagCreateWithoutIzakayasInput = {
+  name: string
+  sortOrder?: number
+}
+
+export type TagUncheckedCreateWithoutIzakayasInput = {
+  id?: number
+  name: string
+  sortOrder?: number
+}
+
+export type TagCreateOrConnectWithoutIzakayasInput = {
+  where: Prisma.TagWhereUniqueInput
+  create: Prisma.XOR<Prisma.TagCreateWithoutIzakayasInput, Prisma.TagUncheckedCreateWithoutIzakayasInput>
+}
+
+export type TagUpsertWithoutIzakayasInput = {
+  update: Prisma.XOR<Prisma.TagUpdateWithoutIzakayasInput, Prisma.TagUncheckedUpdateWithoutIzakayasInput>
+  create: Prisma.XOR<Prisma.TagCreateWithoutIzakayasInput, Prisma.TagUncheckedCreateWithoutIzakayasInput>
+  where?: Prisma.TagWhereInput
+}
+
+export type TagUpdateToOneWithWhereWithoutIzakayasInput = {
+  where?: Prisma.TagWhereInput
+  data: Prisma.XOR<Prisma.TagUpdateWithoutIzakayasInput, Prisma.TagUncheckedUpdateWithoutIzakayasInput>
+}
+
+export type TagUpdateWithoutIzakayasInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type TagUncheckedUpdateWithoutIzakayasInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+
+/**
+ * Count Type TagCountOutputType
+ */
+
+export type TagCountOutputType = {
+  izakayas: number
+}
+
+export type TagCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  izakayas?: boolean | TagCountOutputTypeCountIzakayasArgs
+}
+
+/**
+ * TagCountOutputType without action
+ */
+export type TagCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TagCountOutputType
+   */
+  select?: Prisma.TagCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * TagCountOutputType without action
+ */
+export type TagCountOutputTypeCountIzakayasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IzakayaTagWhereInput
+}
 
 
 export type TagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  sortOrder?: boolean
+  izakayas?: boolean | Prisma.Tag$izakayasArgs<ExtArgs>
+  _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tag"]>
 
 export type TagSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  sortOrder?: boolean
 }, ExtArgs["result"]["tag"]>
 
 export type TagSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  sortOrder?: boolean
 }, ExtArgs["result"]["tag"]>
 
 export type TagSelectScalar = {
   id?: boolean
   name?: boolean
+  sortOrder?: boolean
 }
 
-export type TagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["tag"]>
+export type TagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sortOrder", ExtArgs["result"]["tag"]>
+export type TagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  izakayas?: boolean | Prisma.Tag$izakayasArgs<ExtArgs>
+  _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type TagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type TagIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $TagPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Tag"
-  objects: {}
+  objects: {
+    izakayas: Prisma.$IzakayaTagPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
+    sortOrder: number
   }, ExtArgs["result"]["tag"]>
   composites: {}
 }
@@ -716,6 +840,7 @@ readonly fields: TagFieldRefs;
  */
 export interface Prisma__TagClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  izakayas<T extends Prisma.Tag$izakayasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$izakayasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IzakayaTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -747,6 +872,7 @@ export interface Prisma__TagClient<T, Null = never, ExtArgs extends runtime.Type
 export interface TagFieldRefs {
   readonly id: Prisma.FieldRef<"Tag", 'Int'>
   readonly name: Prisma.FieldRef<"Tag", 'String'>
+  readonly sortOrder: Prisma.FieldRef<"Tag", 'Int'>
 }
     
 
@@ -763,6 +889,10 @@ export type TagFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Tag
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
   /**
    * Filter, which Tag to fetch.
    */
@@ -782,6 +912,10 @@ export type TagFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
+  /**
    * Filter, which Tag to fetch.
    */
   where: Prisma.TagWhereUniqueInput
@@ -799,6 +933,10 @@ export type TagFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Omit specific fields from the Tag
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
   /**
    * Filter, which Tag to fetch.
    */
@@ -848,6 +986,10 @@ export type TagFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
+  /**
    * Filter, which Tag to fetch.
    */
   where?: Prisma.TagWhereInput
@@ -895,6 +1037,10 @@ export type TagFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the Tag
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
   /**
    * Filter, which Tags to fetch.
    */
@@ -944,6 +1090,10 @@ export type TagCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
+  /**
    * The data needed to create a Tag.
    */
   data: Prisma.XOR<Prisma.TagCreateInput, Prisma.TagUncheckedCreateInput>
@@ -989,6 +1139,10 @@ export type TagUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    * Omit specific fields from the Tag
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
   /**
    * The data needed to update a Tag.
    */
@@ -1056,6 +1210,10 @@ export type TagUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
+  /**
    * The filter to search for the Tag to update in case it exists.
    */
   where: Prisma.TagWhereUniqueInput
@@ -1082,6 +1240,10 @@ export type TagDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
+  /**
    * Filter which Tag to delete.
    */
   where: Prisma.TagWhereUniqueInput
@@ -1102,6 +1264,30 @@ export type TagDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
+ * Tag.izakayas
+ */
+export type Tag$izakayasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IzakayaTag
+   */
+  select?: Prisma.IzakayaTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IzakayaTag
+   */
+  omit?: Prisma.IzakayaTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IzakayaTagInclude<ExtArgs> | null
+  where?: Prisma.IzakayaTagWhereInput
+  orderBy?: Prisma.IzakayaTagOrderByWithRelationInput | Prisma.IzakayaTagOrderByWithRelationInput[]
+  cursor?: Prisma.IzakayaTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IzakayaTagScalarFieldEnum | Prisma.IzakayaTagScalarFieldEnum[]
+}
+
+/**
  * Tag without action
  */
 export type TagDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1113,4 +1299,8 @@ export type TagDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the Tag
    */
   omit?: Prisma.TagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagInclude<ExtArgs> | null
 }
