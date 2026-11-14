@@ -5,7 +5,7 @@ type Shape<T> = { [K in keyof T]: T[K] extends string ? string : Shape<T[K]> };
 export type Messages = Shape<typeof ja>;
 
 export const en = {
-  header: { title: "Nishinari Izakaya Crawl", login: "Login with Google", mypage: "My Page", logout: "Logout" },
+  header: { title: "Nishinari Izakaya Crawl", login: "Google Login", mypage: "My Page", logout: "Logout" },
   plans: { index: { confirmDelete: "Are you sure you want to delete?" }, publicFalse: "This plan is private" },
 } satisfies Messages;
 
