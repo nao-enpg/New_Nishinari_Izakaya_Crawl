@@ -9,6 +9,7 @@
 - 「再現済み」は独立検証（`review/deliverables-review.md`）で現行と同じ版の CSS や HTML を組み立てて確かめたもの。「推定」はコードとライブラリのソースから判断したもの。
 
 改訂履歴
+- v0.2（2026-11-14）: C-003 の方式を Places UI Kit に変更した（費用の試算 v0.2）。
 - v0.1（2026-11-14）: 独立検証の指摘を反映した。
   - 追加: D-024（検索の全列検索）、D-025（誰でもアカウントを作れる）、Q-009、Q-010、C-016
   - 修正: D-013、D-016、D-017、D-019、D-020、D-021、D-X01、D-X06 の記述
@@ -82,7 +83,7 @@
 | --- | --- | --- | --- | --- |
 | C-001 | sorcery による Google OAuth（`/oauth/google`、`/oauth/callback`） | Firebase Authentication の Google ログイン（`/__/auth/*` の中継＋セッション作成の口）。旧ユーザーは Google アカウントの ID で紐付ける | F3 | 承認済み（計画: 認証） |
 | C-002 | `/login`（406） | ログイン画面、または Google ログインの開始に置き換える | F3 | 承認待ち |
-| C-003 | 写真は DB に保存した Google の写真 URL | 表示のたびに Places API から取得する（遅延読み込み、1日の上限、代替画像、撮影者の表示） | F2 / F4 | 承認済み（計画: Google Maps の規約） |
+| C-003 | 写真は DB に保存した Google の写真 URL | 表示のたびに、ブラウザで Google の Places UI Kit（Place Details Compact 要素）が取得して表示する。写真の保存・キャッシュはしない。撮影者と Google の表示は部品が出す。1日の上限は Google Cloud の日次クォータ（1日 320件）で、超えたら代替画像。部品をそのまま出すか、写真と Google の表示だけにするかは F4 で決める | F2 / F4 | 承認済み（計画: Google Maps の規約。方式は 2026-11-14 に Nao が案 B を選択。`poc/2026-11-14-cost-estimate.md`） |
 | C-004 | 「Google Mapで見る」は手入力の URL | place_id から作る（手入力の URL を残すかは要確認） | F4 | 承認待ち |
 | C-005 | 「行き方を調べる」は保存した座標 | place_id から作る | F4 | 承認待ち |
 | C-006 | 一覧を開くたびに地図を初期化し、Turbo で戻るたびに Maps JS を読み込み直す（推定）。`google.maps.Marker` | 地図を開いたときに初めて読み込み、地図は使い回す。AdvancedMarker と Map ID | F4 | 承認待ち |
