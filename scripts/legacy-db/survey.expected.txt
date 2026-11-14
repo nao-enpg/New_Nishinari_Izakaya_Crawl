@@ -1,0 +1,140 @@
+## 1. テーブルと列（db/schema.rb との一致の確認）
+    table_name     |    column_name    |          data_type          | is_nullable 
+-------------------+-------------------+-----------------------------+-------------
+ authentications   | id                | bigint                      | NO
+ authentications   | user_id           | integer                     | NO
+ authentications   | provider          | character varying           | NO
+ authentications   | uid               | character varying           | NO
+ authentications   | created_at        | timestamp without time zone | NO
+ authentications   | updated_at        | timestamp without time zone | NO
+ favorites         | id                | bigint                      | NO
+ favorites         | user_id           | bigint                      | NO
+ favorites         | izakaya_id        | bigint                      | NO
+ favorites         | created_at        | timestamp without time zone | NO
+ favorites         | updated_at        | timestamp without time zone | NO
+ izakaya_plans     | id                | bigint                      | NO
+ izakaya_plans     | plan_id           | bigint                      | NO
+ izakaya_plans     | izakaya_id        | bigint                      | NO
+ izakaya_plans     | created_at        | timestamp without time zone | NO
+ izakaya_plans     | updated_at        | timestamp without time zone | NO
+ izakaya_plans     | row_order         | integer                     | YES
+ izakaya_tags      | id                | bigint                      | NO
+ izakaya_tags      | izakaya_id        | bigint                      | NO
+ izakaya_tags      | tag_id            | bigint                      | NO
+ izakaya_tags      | created_at        | timestamp without time zone | NO
+ izakaya_tags      | updated_at        | timestamp without time zone | NO
+ izakayas          | id                | bigint                      | NO
+ izakayas          | name              | character varying           | YES
+ izakayas          | formatted_address | character varying           | YES
+ izakayas          | lat               | double precision            | YES
+ izakayas          | lng               | double precision            | YES
+ izakayas          | photo_reference   | character varying           | YES
+ izakayas          | image             | character varying           | YES
+ izakayas          | opening_hours     | character varying           | YES
+ izakayas          | description       | character varying           | YES
+ izakayas          | created_at        | timestamp without time zone | NO
+ izakayas          | updated_at        | timestamp without time zone | NO
+ izakayas          | url               | text                        | YES
+ plans             | id                | bigint                      | NO
+ plans             | user_id           | bigint                      | NO
+ plans             | name              | character varying           | YES
+ plans             | public            | boolean                     | YES
+ plans             | created_at        | timestamp without time zone | NO
+ plans             | updated_at        | timestamp without time zone | NO
+ plans             | description       | text                        | YES
+ schema_migrations | version           | character varying           | NO
+ tags              | id                | bigint                      | NO
+ tags              | name              | character varying           | NO
+ tags              | created_at        | timestamp without time zone | NO
+ tags              | updated_at        | timestamp without time zone | NO
+ users             | id                | bigint                      | NO
+ users             | name              | character varying           | NO
+ users             | email             | character varying           | NO
+ users             | crypted_password  | character varying           | YES
+ users             | salt              | character varying           | YES
+ users             | created_at        | timestamp without time zone | NO
+ users             | updated_at        | timestamp without time zone | NO
+
+ latest_migration | migrations 
+------------------+------------
+ 20240926172151   |         14
+
+
+## 2. 件数・番号の範囲・シーケンス・最終更新日（新しい番号は旧番号の続きから振る。P2-4）
+   table_name    | row_count | min_id | max_id | last_created | last_updated | seq_last_value 
+-----------------+-----------+--------+--------+--------------+--------------+----------------
+ authentications |         5 |      1 |      5 | 2024-10-07   | 2024-10-07   |              5
+ favorites       |         4 |      1 |      4 | 2024-07-01   | 2024-07-01   |              4
+ izakaya_plans   |         6 |      1 |      6 | 2024-10-01   | 2024-10-01   |              6
+ izakaya_tags    |         5 |      1 |      5 | 2024-06-14   | 2024-06-14   |              5
+ izakayas        |         4 |      1 |      4 | 2024-06-13   | 2024-09-01   |             12
+ plans           |         3 |      1 |      3 | 2024-08-01   | 2024-10-01   |              3
+ tags            |         3 |      1 |      3 | 2024-06-14   | 2024-06-14   |              3
+ users           |         5 |      1 |      5 | 2024-10-05   | 2024-10-06   |              5
+
+
+## 3. ユーザーと Google アカウントの紐付け（F3。旧ユーザーは Google アカウントの ID で紐付ける）
+ users | with_password | without_authentication | password_only | without_authentication_with_data | with_multiple_authentications | with_plans | with_favorites | blank_name | max_name_length 
+-------+---------------+------------------------+---------------+----------------------------------+-------------------------------+------------+----------------+------------+-----------------
+     5 |             2 |                      2 |             1 |                                1 |                             1 |          2 |              2 |          1 |               5
+
+### 3b. uid の形式（Google アカウントの ID は数字だけで、通常は21桁）
+ provider | row_count | numeric_uid | numeric_21_digits | min_uid_length | max_uid_length | orphan_user_id 
+----------+-----------+-------------+-------------------+----------------+----------------+----------------
+ google   |         5 |           4 |                 3 |              7 |             21 |              1
+
+### 3c. (provider, uid) の重複（一意制約が無い）
+ duplicated_pairs | extra_rows | pairs_with_different_users 
+------------------+------------+----------------------------
+                1 |          1 |                          1
+
+
+## 4. 居酒屋（P2 の突き合わせ）
+ izakayas | blank_name | name_with_outer_spaces | blank_description | blank_url | without_coordinates | without_image | without_tags | max_name_length | max_description_length 
+----------+------------+------------------------+-------------------+-----------+---------------------+---------------+--------------+-----------------+------------------------
+        4 |          0 |                      2 |                 2 |         1 |                   1 |             2 |            1 |               8 |                      3
+
+### 4b. 同じ店名（前後の空白を除き、英字の大文字小文字を区別しない）
+ duplicated_names | extra_rows 
+------------------+------------
+                1 |          1
+
+### 4c. 「Google Mapで見る」の URL の形（C-004、CID での照合）
+    url_host     | has_cid | has_place_id | row_count 
+-----------------+---------+--------------+-----------
+ google.*        | t       | f            |         2
+ (なし)          | (null)  | (null)       |         1
+ maps.app.goo.gl | f       | f            |         1
+
+
+## 5. タグ
+ tags | duplicated_tag_names | izakaya_tags | duplicated_pairs | extra_rows | max_tags_per_izakaya 
+------+----------------------+--------------+------------------+------------+----------------------
+    3 |                    1 |            5 |                1 |          1 |                    3
+
+
+## 6. 旅程表
+ plans | public_true | public_false | public_null | blank_name | without_izakayas | orphan_user | max_name_length | max_description_length 
+-------+-------------+--------------+-------------+------------+------------------+-------------+-----------------+------------------------
+     3 |           1 |            1 |           1 |          2 |                1 |           0 |               3 |                      2
+
+### 6b. 旅程表の店（row_order は 2024-09-12 15:57 UTC のマイグレーションで、値を埋めずに追加された）
+ izakaya_plans | row_order_null | null_created_before_migration | null_created_after_migration | min_row_order | max_row_order 
+---------------+----------------+-------------------------------+------------------------------+---------------+---------------
+             6 |              2 |                             2 |                            0 |             0 |       4194304
+
+ plans_with_izakayas | plans_with_null_row_order | plans_mixing_null_and_value | max_izakayas_per_plan 
+---------------------+---------------------------+-----------------------------+-----------------------
+                   2 |                         1 |                           1 |                     3
+
+### 6c. 並び順が同じ値の組（移行では id 順で振り直す）と、同じ店の重複（D-014）
+ tied_row_order_groups | same_izakaya_groups | same_izakaya_extra_rows 
+-----------------------+---------------------+-------------------------
+                     1 |                   1 |                       1
+
+
+## 7. お気に入り（一意制約が無い。移行で1件にまとめる）
+ favorites | duplicated_pairs | extra_rows | orphan_user | orphan_izakaya 
+-----------+------------------+------------+-------------+----------------
+         4 |                1 |          1 |           0 |              0
+

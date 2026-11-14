@@ -1,0 +1,66 @@
+name: Legacy DB survey (read-only)
+
+# 旧 DB（Rails 版、Koyeb の PostgreSQL）を読み取り専用で調べ、集計値だけを出す（工程計画 P1-4）。
+#
+# 前提（Nao が GitHub の画面で設定する）
+# - environment「legacy-db」を作り、secret「LEGACY_DATABASE_URL」に旧 DB の接続文字列を登録する。
+#   リポジトリの secrets には置かない（どのブランチの workflow からでも読めてしまうため）。
+# - その environment の「Deployment branches」を main に限定し、required reviewers に Nao を入れる
+#   （public リポジトリなら無料で使える）。実行のたびに Nao の承認が要るようになる。
+#
+# 注意: このリポジトリは public なので、Actions のログは誰でも読める。
+# - 出力は集計値だけ（scripts/legacy-db/survey.sql）。行の値を出す変更をしないこと。
+# - 接続文字列の各部分（ホスト名・ユーザー名・パスワード・DB 名）を、ログで伏せ字にしてから接続する。
+#   接続エラーのメッセージにホスト名が出ることがあるため。
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: legacy-db-survey
+  cancel-in-progress: false
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: legacy-db
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Mask each part of the connection string
+        env:
+          LEGACY_DATABASE_URL: ${{ secrets.LEGACY_DATABASE_URL }}
+        run: |
+          if [ -z "$LEGACY_DATABASE_URL" ]; then
+            echo "::error::environment legacy-db の secret LEGACY_DATABASE_URL が未登録です"; exit 1
+          fi
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit, unquote
+          u = urlsplit(os.environ["LEGACY_DATABASE_URL"])
+          parts = [u.hostname, u.username, u.password, u.path.lstrip("/")]
+          for p in parts:
+              if p:
+                  for v in {p, unquote(p)}:
+                      print(f"::add-mask::{v}")
+          PY
+
+      - name: Survey
+        env:
+          LEGACY_DATABASE_URL: ${{ secrets.LEGACY_DATABASE_URL }}
+        run: |
+          psql --version
+          scripts/legacy-db/survey.sh | tee survey.txt
+          {
+            echo '## 旧 DB の調査結果（集計値のみ）'
+            echo
+            echo '```'
+            cat survey.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
