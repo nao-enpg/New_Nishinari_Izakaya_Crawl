@@ -8,7 +8,7 @@ const db = env.DB;
 async function seed() {
   const now = "2026-11-14 00:00:00";
   await db.batch(
-    ["favorites", "izakaya_plans", "plans", "users", "izakaya_tags", "izakayas", "tags"].map((t) =>
+    ["sessions", "favorites", "izakaya_plans", "plans", "users", "izakaya_tags", "izakayas", "tags"].map((t) =>
       db.prepare(`DELETE FROM ${t}`),
     ),
   );

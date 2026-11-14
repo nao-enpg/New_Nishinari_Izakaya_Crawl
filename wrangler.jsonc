@@ -15,6 +15,13 @@
 		"enabled": true
 	},
 	"upload_source_maps": true,
+	// PoC d: Firebase の設定（秘密情報ではない）。空のときはログインを無効にする。env ごとに書く必要がある（vars は env に継承されない）
+	"vars": {
+		"FIREBASE_PROJECT_ID": "",
+		"FIREBASE_AUTH_DOMAIN": "",
+		"FIREBASE_API_KEY": "",
+		"SITE_ORIGIN": "http://localhost:5173"
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -26,6 +33,12 @@
 	"env": {
 		"staging": {
 			"name": "nishinari-next-staging",
+			"vars": {
+				"FIREBASE_PROJECT_ID": "",
+				"FIREBASE_AUTH_DOMAIN": "",
+				"FIREBASE_API_KEY": "",
+				"SITE_ORIGIN": ""
+			},
 			"d1_databases": [
 				{
 					"binding": "DB",
