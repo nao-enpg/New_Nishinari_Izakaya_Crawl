@@ -58,5 +58,5 @@ pnpm exec prisma generate
 ## この作業環境（Claude のクラウドセッション）での注意
 
 - `binaries.prisma.sh` に届かないため、`prisma generate` は `PRISMA_SCHEMA_ENGINE_BINARY=/bin/true pnpm exec prisma generate` と、その場で付けて実行する。**この変数を export しない**。付けたまま `prisma migrate diff` を実行すると、何も出力せずに正常終了し、空のマイグレーションをコミットしてしまう。migrate diff は CI か手元の PC で実行する。
-- `ui.shadcn.com` に届かないため、shadcn/ui の部品追加は CI か手元の PC で行う。
+- クラウドの environment「new_nishinari_izakaya_crawl」では、`ui.shadcn.com`・`developers.google.com`・`developers.cloudflare.com`・`qiita.com`・`zenn.dev` に届く（2026-11-14 に追加）。Default の environment では届かないので、shadcn/ui の部品追加は CI か手元の PC で行う。
 - 旧 DB（Koyeb の Postgres）にはここから接続できない。
