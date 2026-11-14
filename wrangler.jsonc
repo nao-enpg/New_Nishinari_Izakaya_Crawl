@@ -4,10 +4,13 @@
  *
  * - D1 の database_id は P0 で Cloudflare に D1 を作成したら差し替える（--location apac で作成）
  * - 本番・staging は env で分ける。ルート／カスタムドメインの付け替えは手作業（P7 の手順書）
+ * - 環境はビルド時に CLOUDFLARE_ENV で決まる（例: CLOUDFLARE_ENV=staging pnpm build）。wrangler deploy --env だけでは切り替わらない
+ * - 最上位はローカル専用。本番と同じ名前にしないこと（誤って本番を上書きしないため）
+ * - Cron（triggers.crons）は F2 で座標の定期更新を作るときに追加する
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "nishinari-next",
+	"name": "nishinari-next-local",
 	"compatibility_date": "2026-11-13",
 	"compatibility_flags": ["nodejs_compat"],
 	"main": "./workers/app.ts",
@@ -26,6 +29,7 @@
 	"env": {
 		"staging": {
 			"name": "nishinari-next-staging",
+			// staging は noindex とアクセス制限を付ける（P6）
 			"d1_databases": [
 				{
 					"binding": "DB",
@@ -37,6 +41,9 @@
 		},
 		"production": {
 			"name": "nishinari-next",
+			// 本番は workers.dev とプレビュー URL で公開しない
+			"workers_dev": false,
+			"preview_urls": false,
 			"d1_databases": [
 				{
 					"binding": "DB",

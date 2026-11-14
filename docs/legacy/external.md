@@ -7,7 +7,7 @@
 | Google OAuth（sorcery） | ログイン | Firebase Authentication に置き換え（C-001） |
 | Maps JavaScript API | 一覧の地図 | 継続。開いたときに読み込む、AdvancedMarker と Map ID（C-006） |
 | Places API (Legacy) | 取り込みスクリプトで店の情報を取得（現在は使われていない） | Places API (New) に置き換え |
-| Google Analytics 4 | `G-9MPR30BKGN` | 同じ ID を引き継ぐ。ページ遷移での page_view を確認 |
+| Google Analytics 4 | `G-9MPR30BKGN`。GA の script が D-021 の副作用で本文側に入り、Turbo の遷移ごとに再実行されるため、現行は遷移のたびに page_view を送っていると考えられる（模擬環境で再実行を確認） | 同じ ID を引き継ぐ。クライアント側の遷移でも page_view を送る（F1 の受け入れ条件） |
 | Font Awesome Kit | ハートのアイコン | shadcn/ui 側のアイコン（lucide など）に置き換え可（要確認） |
 | Google Fonts | BIZ UDPGothic | 継続（見た目の方針で決める） |
 | jQuery 3.7.1 | 読み込むだけで未使用 | 移植しない |

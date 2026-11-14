@@ -13,7 +13,10 @@
   - Twitter カードは `summary_large_image`。
 - 読み込むもの: Font Awesome Kit、Google Fonts（BIZ UDPGothic）、jQuery 3.7.1（未使用）、GA4（`G-9MPR30BKGN`）。
 - 本文のフォントは BIZ UDPGothic。
-- **ヘッダー**（画面上部に固定、白文字。未ログインは `shared/_before_login_header.erb`、ログイン済みは `shared/_header.html.erb`）
+- `<html>` に `lang` が無く、`<meta charset>` も無い（C-016）。
+- **テーマ**: DaisyUI の light / dark を OS の設定で切り替える（`tailwind.config.js`）。多くの文字が `text-white` 前提のため、ライトモードでは読めない箇所がある（再現済み。D-019）。
+- **`<head>` の中に Turbo Frame（`modal`）がある**ため、それより後ろの meta・OGP・canonical・favicon・script は本文（body）側に入る（再現済み。D-021）。
+- **ヘッダー**（画面上部に固定。背景は透明で文字は白。そのため、ライトモードでは背景画像のあるトップと問い合わせ以外で見えない（D-019）。未ログインは `shared/_before_login_header.erb`、ログイン済みは `shared/_header.html.erb`）
   - 未ログイン: サイト名（`header.title`、`/` へのリンク。言語の指定が消える → D-008）、`JP` / `EN` の切り替え、`header.login`（Google のロゴつき。`/oauth/google` へ）。
   - ログイン済み: サイト名、`JP` / `EN`、`header.mypage`（`/profile`）/ `header.logout`（`DELETE /logout`）。
 - **フラッシュ**（`shared/_flash_message.html.erb`）: ヘッダーの下に `pt-16` の余白をとって表示。種類は success / danger / notice / alert。

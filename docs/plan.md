@@ -1,4 +1,4 @@
-# 西成泥酔旅行 TS版リビルド 工程計画 v0.4
+# 西成泥酔旅行 TS版リビルド 工程計画 v0.4.1
 
 作成: 2026-11-13 / 更新: 2026-11-14
 対象: [nao-enpg/Nishinari_Izakaya_Crawl](https://github.com/nao-enpg/Nishinari_Izakaya_Crawl)（Rails 7.1）を TypeScript で作り直し、Cloudflare で公開する
@@ -6,6 +6,7 @@
 改訂履歴
 - v0.2: Hotwire をやめ、React Router v8＋shadcn/ui に変更
 - v0.3: 認証を Firebase Authentication に変更
+- v0.4.1（2026-11-14）: 成果物の独立検証を反映した（Prisma の原子性の説明、CI の環境の選び方、旧 DB の調査項目、現行サイトの検索の脆弱性）
 - v0.4: 独立レビューの指摘を反映した。あわせて次を変更した
   - 匿名ユーザーをやめた
   - Workers は有料プランを前提にした
@@ -67,14 +68,17 @@
 - 全22項目の一覧は、レビューの報告書の 3.4節にある。P1 の現行仕様台帳に取り込む。
 
 ### 使われていないコード（移植しない）
-- users と sessions のコントローラ、user_sessions の new と create。ただし**ログアウト（`DELETE /logout`）は使われているので移植する**。
+- users と sessions のコントローラ、user_sessions の new と create。画面は無いが、エンドポイントは動いており、誰でもメール確認なしでアカウントを作れる（推定。D-025）。ただし**ログアウト（`DELETE /logout`）は使われているので移植する**。
 - `izakayas#favorites`（呼んでいるメソッドが存在せず、どの場合も 500 になる）
 - React と MUI、ActionCable、`map.js`、`modal` コントローラ、jQuery、使われていない gem と列
 
 ### 技術的な制約
-- **Prisma＋D1 のトランザクションは、エラーにならないまま原子性が無い**。アダプター 7.10.1 の commit と rollback は何もせず、`$transaction` も1文ずつ実行される（ソースで確認済み）。原子的に動くのは D1 の `batch()` だけ。
+- **Prisma＋D1 には原子性が無い**（技術検証で再現済み）。原子的に動くのは D1 の `batch()` だけ。
+  - 対話型 `$transaction(async tx => …)` は、実行前に例外になる。
+  - 配列形式 `$transaction([...])` は、警告だけ出して1文ずつ実行する。途中で失敗しても前の更新は残る。
+  - ネストした書き込み（親と子を一度に作るなど）も同じで、子の失敗で親の行だけが残る。
   - 並べ替え、旅程表の削除、移行の取り込みは、`batch()` か1本の SQL で書く。
-  - `prisma.$transaction` は lint で禁止する。
+  - `prisma.$transaction` と `onDelete: Cascade` は、CI の検査で禁止する（ESLint を入れるまでは grep による暫定の検査）。ネストした書き込みはコードレビューの観点に入れる。
 - **D1 のマイグレーションでデータが消えることがある**。D1 では外部キーの強制を止められないため、Prisma がテーブルを作り直す SQL を出すと、連鎖削除で子の行が消える。
   - 生成した SQL に親テーブルの `DROP TABLE` が含まれていないかを CI で検査する。
   - 適用は `wrangler d1 migrations` で行う。
@@ -145,7 +149,10 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
 ## 3. 各工程の詳細
 
 ### P0 環境準備
-- **GitHub（Nao）**: Claude との連携を有効にし、新リポジトリを作る。main ブランチは保護する。
+- **GitHub（Nao）**
+  - Claude との連携を有効にし、新リポジトリを作る。main ブランチは保護する。
+  - environment を staging と production の2つ作る。Cloudflare のトークンは、リポジトリではなく各 environment の secrets に置く。production の「Deployment branches」は main に限定する。
+  - 本番デプロイの承認（required reviewers）は、private リポジトリでは GitHub の有料プランが必要。使えない場合は、本番デプロイを Nao が手で実行するだけにする。リポジトリの公開範囲とプランを決める。
 - **Cloudflare（Nao）**
   - Workers の有料プランに入る。
   - API トークンを発行する。権限は Workers と D1 だけにする。
@@ -168,7 +175,7 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
   - C3 で React Router の雛形を作り、上の表のとおりに版を固定する。
   - `uv tool install specify-cli==1.4.0` の後、`specify init --here --force --non-interactive --integration claude --script sh` を実行する。
   - CLAUDE.md に、spec-kit の機能の切り替え手順（`SPECIFY_FEATURE_DIRECTORY`）を書く。
-  - GitHub Actions を用意する。順番は、型チェック・lint・テスト → D1 マイグレーション → `wrangler deploy`。
+  - GitHub Actions を用意する（下書き済み）。PR では、型チェック・禁止パターンの検査・テスト・ビルドを行う。デプロイは「`CLOUDFLARE_ENV` を付けたビルド → D1 マイグレーション → `wrangler deploy --env`」の順。**環境はビルド時に `CLOUDFLARE_ENV` で決まり、`wrangler deploy --env` だけでは切り替わらない**。
 - **完了条件**: Claude が push でき、Actions から staging に Hello World がデプロイされる。
 
 ### P1 調査
@@ -188,7 +195,10 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
 4. **旧 DB の調査**（読み取りのみ）
    - テーブルごとの件数を数える。
    - `authentications.uid` の形式（Google アカウントの ID か）を確かめる。
-   - 番号の最大値、`row_order` の値の分布、重複したお気に入りの有無を調べる。
+   - 番号の最大値、`row_order` の値の分布（NULL の行があるか）、重複したお気に入りの有無を調べる。
+   - メール/パスワードで作られたユーザー（`crypted_password` が NULL でない、`authentications` を持たない）の数。Google と紐付けられないので、移行するか決める。
+   - `authentications` の `(provider, uid)` の重複と、`user_id` の孤立。
+   - DB のロケール（`LC_CTYPE`）。全角英字の大文字・小文字の扱いに影響する（Q-009）。
 5. **技術検証**（試作コードは捨てる前提）
    - a. React Router v8 の雛形が、ローカルと staging で動くか。Worker の入口に Cron を同居させられるか。**SSR＋Prisma の CPU 時間を実測する**。
    - b. Prisma 7.10＋D1 で、多対多の関係とタグの AND 検索が動くか。Vite でのバンドルに問題がないか。
@@ -313,7 +323,9 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
 | リスク | 影響 | 対策 |
 | --- | --- | --- |
 | 写真の表示による Places API の費用と、取得口の悪用 | 高 | 遅延読み込み、DB にある店だけ受け付ける、レート制限、日次上限、代替画像、Bot 対策 |
-| Prisma＋D1 で、原子性が無いことに気づかず実装する | 高 | `$transaction` を lint で禁止し、`batch()` の巻き戻りをテストで保証する |
+| Prisma＋D1 で、原子性が無いことに気づかず実装する | 高 | `$transaction` と CASCADE を CI で禁止し、ネストした書き込みをレビューで確認する。`batch()` の巻き戻りをテストで保証する |
+| CI が意図しない環境にデプロイする | 高 | ビルド時に `CLOUDFLARE_ENV` を付け、`wrangler deploy --env` との食い違いで止める。最上位の Worker 名を本番と別にする |
+| 現行サイトの検索（ransack）で、ほかのユーザーの個人情報を推測できる | 高 | 現行サイトに応急処置のパッチを当てる（`0001-ransack-allowlist.patch`）。新しい実装では許可したパラメータだけを読む（D-024） |
 | D1 のマイグレーションや再投入で、データが消える | 高 | 生成 SQL の検査、本番の複製での事前適用、upsert のみ、Time Travel |
 | 本番切り替え時の DNS・証明書・HSTS・Firebase の設定ミス | 高 | 手順書、staging での事前計測、リハーサル、ロールバック手順 |
 | 最終移行の間に旧サイトへ書き込まれたデータが失われる | 中 | 切り替え中は旧サイトをメンテナンス表示にする |
@@ -328,6 +340,7 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
 
 ## 6. 次の一手
 
+0. **Nao（至急）**: 現行サイトに ransack の修正パッチ（`0001-ransack-allowlist.patch`）を当てる。動作確認は本番ではなく手元のコピーで行う。
 1. **Nao**: GitHub を Claude と連携し、新リポジトリの名前を決めて作成する。
 2. **Nao**: Cloudflare（有料プラン）、Firebase、Google Cloud を準備し、DNS の管理先を確認する。旧 DB の接続情報は GitHub Secrets に登録する。
 3. **Nao**: Google テイクアウトで保存済みリストを書き出す。

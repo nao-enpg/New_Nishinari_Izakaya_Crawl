@@ -31,14 +31,19 @@
 | --- | --- |
 | users.id | 引き継ぐ |
 | users.name | 引き継ぐ |
-| users.email | 旧ユーザーとの紐付けの予備として一時的に持つか、要確認（F3） |
+| users.email | 一意制約あり。旧ユーザーとの紐付けの予備として一時的に持つか、要確認（F3） |
 | users.crypted_password / salt | 移さない（使われていない） |
-| authentications.provider / uid | uid（Google アカウントの ID の見込み）を `users.google_sub` として引き継ぐ。P1 で形式を確認 |
+| authentications.provider / uid | uid（Google アカウントの ID の見込み）を `users.google_sub` として引き継ぐ。P1 で形式を確認。`(provider, uid)` に一意制約は無く、`user_id` は integer で外部キーも無い |
+
+**P1 の旧 DB 調査で数えるもの**（R35 のメール/パスワードで作られたユーザーがいる可能性があるため）
+- `crypted_password` が NULL でないユーザー
+- `authentications` を持たないユーザー（Google と紐付けられないので、移行するか決める）
+- `(provider, uid)` の重複、`authentications.user_id` の孤立
 
 ## plans / izakaya_plans / favorites
 
-- plans: id（**URL で共有されているので引き継ぐ**）、user_id、name（NULL あり）、public、description、日時。
-- izakaya_plans: plan_id、izakaya_id、row_order（ranked-model の離れた整数）→ 順番を保って 0, 1, 2… の `position` に振り直す。同じ店の重複はそのまま残すか要確認（D-014）。
+- plans: id（**URL で共有されているので引き継ぐ**）、user_id、name（NULL あり）、public（NULL を許し、既定値なし → 移行で NULL は false にする）、description、日時。
+- izakaya_plans: plan_id、izakaya_id、row_order（ranked-model の離れた整数）→ 順番を保って 0, 1, 2… の `position` に振り直す。`row_order` は 2024-09-12 に値を埋めずに追加されたので、それより前の行は NULL の可能性がある（現行は NULL を最後に並べる）。移行では「NULL は最後、その中は id 順」とする。同じ店の重複はそのまま残すか要確認（D-014）。
 - favorites: user_id、izakaya_id（DB に一意制約が無い）→ 重複を1件にまとめ、一意制約を付ける。
 
 ## 外部キー

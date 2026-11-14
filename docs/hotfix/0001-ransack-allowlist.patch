@@ -1,0 +1,73 @@
+From 98817be646b9c205d9ba83f84e7ee16ba4d32ca2 Mon Sep 17 00:00:00 2001
+From: claude <noreply@anthropic.com>
+Date: Sat, 14 Nov 2026 17:22:09 +0900
+Subject: [PATCH] =?UTF-8?q?fix:=20ransack=20=E3=81=AE=E6=A4=9C=E7=B4=A2?=
+ =?UTF-8?q?=E5=AF=BE=E8=B1=A1=E3=82=92=E5=BA=97=E5=90=8D=E3=81=A8=E3=82=BF?=
+ =?UTF-8?q?=E3=82=B0=E3=81=AB=E9=99=90=E5=AE=9A=E3=81=99=E3=82=8B=EF=BC=88?=
+ =?UTF-8?q?=E5=80=8B=E4=BA=BA=E6=83=85=E5=A0=B1=E3=81=AE=E6=8E=A8=E6=B8=AC?=
+ =?UTF-8?q?=E3=82=92=E9=98=B2=E3=81=90=EF=BC=89?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ app/models/application_record.rb | 6 ++++--
+ app/models/izakaya.rb            | 9 +++++++++
+ app/models/tag.rb                | 5 +++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/app/models/application_record.rb b/app/models/application_record.rb
+index 0a1bc32..73c89fb 100644
+--- a/app/models/application_record.rb
++++ b/app/models/application_record.rb
+@@ -1,11 +1,13 @@
+ class ApplicationRecord < ActiveRecord::Base
+   primary_abstract_class
+ 
++  # ransack で検索・並べ替えに使ってよい列と関連は、各モデルで明示的に許可する。
++  # 既定は何も許可しない（以前は全列・全関連を許可しており、メールアドレスなどを検索条件にできた）。
+   def self.ransackable_attributes(_auth_object = nil)
+-    authorizable_ransackable_attributes
++    []
+   end
+ 
+   def self.ransackable_associations(_auth_object = nil)
+-    authorizable_ransackable_associations
++    []
+   end
+ end
+diff --git a/app/models/izakaya.rb b/app/models/izakaya.rb
+index ccc1cda..17960c6 100644
+--- a/app/models/izakaya.rb
++++ b/app/models/izakaya.rb
+@@ -4,4 +4,13 @@ class Izakaya < ApplicationRecord
+   has_many :izakaya_plans
+   has_many :plans, through: :izakaya_plans
+   has_many :favorites, dependent: :destroy
++
++  # 居酒屋一覧の検索で使う条件だけを許可する（q[name_cont]、q[tags_id_all][]）
++  def self.ransackable_attributes(_auth_object = nil)
++    %w[name]
++  end
++
++  def self.ransackable_associations(_auth_object = nil)
++    %w[tags]
++  end
+ end
+diff --git a/app/models/tag.rb b/app/models/tag.rb
+index 7d8fff1..2fb0781 100644
+--- a/app/models/tag.rb
++++ b/app/models/tag.rb
+@@ -1,4 +1,9 @@
+ class Tag < ApplicationRecord
+   has_many :izakaya_tags
+   has_many :izakayas, through: :izakaya_tags
++
++  # q[tags_id_all][] のために id だけを許可する
++  def self.ransackable_attributes(_auth_object = nil)
++    %w[id]
++  end
+ end
+-- 
+2.43.0
+

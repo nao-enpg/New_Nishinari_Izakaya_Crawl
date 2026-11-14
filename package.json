@@ -6,13 +6,15 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "typecheck": "wrangler types && react-router typegen && tsc -b",
-    "deploy": "npm run build && wrangler deploy",
-    "preview": "npm run build && vite preview",
+    "preview": "pnpm build && vite preview",
     "cf-typegen": "wrangler types",
     "postinstall": "wrangler types",
     "test": "vitest run",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "deploy:staging": "CLOUDFLARE_ENV=staging pnpm build && wrangler deploy --env staging",
+    "deploy:production": "CLOUDFLARE_ENV=production pnpm build && wrangler deploy --env production",
+    "check:forbidden": "scripts/check-forbidden.sh"
   },
   "dependencies": {
     "@prisma/adapter-d1": "7.10.1",
