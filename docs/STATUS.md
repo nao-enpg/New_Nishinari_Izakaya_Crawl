@@ -14,15 +14,17 @@
 
 ## 終わっていないこと
 
-### Nao さんの準備・判断（これが済まないと先に進めない）
+### Nao さんの準備（これが済まないと先に進めない。上から順に）
 
-1. **GitHub**: environment（staging / production）に Cloudflare の secrets を登録する。旧 DB の調査用に environment `legacy-db` と secret `LEGACY_DATABASE_URL` を登録する（手順は `scripts/legacy-db/README.md`）
-2. **Cloudflare**（Workers 有料プラン、D1 を staging と本番の2つ `--location apac`、API トークン）、**Firebase**（Spark、Google ログイン、承認済みドメイン）、**Google Cloud**（Places API (New)、Maps JS、キーの分離、予算アラートと API ごとの日次クォータ）
-3. nishinari-izakaya.net の登録状況と DNS の管理先の確認
-4. Google テイクアウトで保存済みリストを書き出す
-5. Google Cloud で「Places UI Kit」の日次クォータを1日 320件にする。ブラウザ用キーを HTTP リファラーと API で制限する
-6. 判断: 海外からのアクセスを制限するか（日本だけにするか、海外にはチャレンジを出すか。英語版の想定読者しだい）
+1. **Cloudflare**: Workers の有料プランに入る。D1 を2つ作る（名前は `nishinari-staging` と `nishinari-production`、場所は Asia-Pacific）。API トークンを作る（ひな形「Edit Cloudflare Workers」に D1 の編集権限を足し、対象をこのアカウントと nishinari-izakaya.net に絞る）。アカウント ID を控える
+2. **Claude に D1 の database_id を2つ伝える**（秘密情報ではない）。Claude が `wrangler.jsonc` に書く
+3. **GitHub**: environment `staging` と `production` を作り、それぞれに secret `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` を登録する。`production` の Deployment branches は main だけにする
+4. **GitHub**: environment `legacy-db` を作り、secret `LEGACY_DATABASE_URL` を登録する（手順は `scripts/legacy-db/README.md`）。`p1/remaining` を main に入れたあと、Actions で旧 DB の調査を実行する
+5. **Firebase**（Spark、Google ログイン、承認済みドメイン）、**Google Cloud**（Places API (New)、Maps JS、Places UI Kit。ブラウザ用キーは HTTP リファラーと API で制限する。予算アラートは任意）
+6. Google テイクアウトで保存済みリストを書き出す
 7. （任意）GA4 の数字。月 500 PV の見込みの確認用
+
+決まったこと（2026-11-14）: 写真は Places UI Kit の部品をそのまま使う、日次上限は設けない、日本以外からのアクセスは止める（確認済みのボットは通す。C-017）、DNS は旧サイトのときから Cloudflare で管理している。
 
 ### Claude の作業（準備の後）
 
