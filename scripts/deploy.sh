@@ -26,6 +26,11 @@ sha="$(git rev-parse --short=12 HEAD)"
 branch="$(git rev-parse --abbrev-ref HEAD)"
 
 if [ "$target" = production ]; then
+  # 本番は main からだけ（Actions の Deploy production も同じ確認をする。手元から出すときのため）
+  if [ "$branch" != main ]; then
+    echo "本番には main からだけデプロイする（今のブランチは ${branch}）" >&2
+    exit 1
+  fi
   # 本番は、コミット済みの内容だけを出す（手元の未コミットの変更を出さない）
   if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
     echo "本番には、コミットしていない変更がある状態ではデプロイしない" >&2
