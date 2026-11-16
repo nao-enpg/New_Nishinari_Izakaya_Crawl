@@ -177,7 +177,7 @@ Nao さんが挙げた「調査 → 設計 → 設計レビュー → 実装 →
   - C3 で React Router の雛形を作り、上の表のとおりに版を固定する。
   - `uv tool install specify-cli==1.4.0` の後、`specify init --here --force --non-interactive --integration claude --script sh` を実行する。
   - CLAUDE.md に、spec-kit の機能の切り替え手順（`SPECIFY_FEATURE_DIRECTORY`）を書く。
-  - GitHub Actions を用意する（下書き済み）。PR では、型チェック・禁止パターンの検査・テスト・ビルドを行う。デプロイは「`CLOUDFLARE_ENV` を付けたビルド → D1 マイグレーション → `wrangler deploy --env`」の順。**環境はビルド時に `CLOUDFLARE_ENV` で決まり、`wrangler deploy --env` だけでは切り替わらない**。
+  - GitHub Actions を用意する（下書き済み）。PR では、型チェック・禁止パターンの検査・テスト・ビルドを行う。デプロイは「`CLOUDFLARE_ENV` を付けたビルド → D1 マイグレーション → `wrangler deploy --env`」の順。**staging も本番も Actions の画面から手動で実行する**（2026-11-16 変更。ワークフロー「Deploy staging」「Deploy production」、手順は `scripts/deploy.sh`）。**環境はビルド時に `CLOUDFLARE_ENV` で決まり、`wrangler deploy --env` だけでは切り替わらない**。
 - **完了条件**: Claude が push でき、Actions から staging に Hello World がデプロイされる。
 
 ### P1 調査

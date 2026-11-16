@@ -28,4 +28,4 @@ pnpm typecheck
 pnpm test
 ```
 
-デプロイは GitHub Actions で行います（main への push で staging、手動の実行で本番）。詳しくは CLAUDE.md の「デプロイ」を参照してください。
+デプロイは GitHub Actions の画面から手動で実行します（Deploy staging / Deploy production）。詳しくは CLAUDE.md の「デプロイ」を参照してください。

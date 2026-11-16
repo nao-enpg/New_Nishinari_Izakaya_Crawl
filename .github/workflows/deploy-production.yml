@@ -1,0 +1,61 @@
+name: Deploy production
+
+# 本番へのデプロイ。Actions の画面から手動で実行する（自動では動かない）。
+# - main からだけ出せる。ほかのブランチを選ぶと、最初の確認で失敗する
+# - 前提: environment「production」に secret CLOUDFLARE_API_TOKEN と CLOUDFLARE_ACCOUNT_ID がある。
+#   その environment の「Deployment branches」を main に限定する。
+#   public リポジトリなので、required reviewers（実行前の承認）も無料で使える
+# - 手順の中身は scripts/deploy.sh
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Only from main
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::本番には main からだけデプロイする（選ばれたのは ${GITHUB_REF_NAME}）"
+            exit 1
+          fi
+
+  check:
+    needs: guard
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma generate
+      - run: scripts/deploy.sh production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Summary
+        run: |
+          {
+            echo "## 本番にデプロイした"
+            echo
+            echo "- コミット: \`$(git rev-parse --short=12 HEAD)\`"
+          } >> "$GITHUB_STEP_SUMMARY"

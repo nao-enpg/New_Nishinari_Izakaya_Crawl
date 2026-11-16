@@ -51,8 +51,10 @@ pnpm exec prisma generate
 
 ## デプロイ
 
-- 通常は GitHub Actions が行う（main への push で staging、手動の dispatch で本番）。
-- **環境はビルド時に `CLOUDFLARE_ENV` で決まる**。`wrangler deploy --env` だけでは切り替わらない。手で行うときは `pnpm deploy:staging` / `pnpm deploy:production` を使う。
+- **staging も本番も、GitHub Actions の画面から手動で実行する**（ワークフロー「Deploy staging」「Deploy production」）。push では自動でデプロイしない。CI（検査）は PR と main への push で自動で動く。
+- 本番は main からだけ。staging は選んだブランチを出せるが、D1 のマイグレーションを含むブランチは main に入れてから出す（staging の DB に当たると戻せない）。
+- 手順の中身は `scripts/deploy.sh`（ビルド → D1 マイグレーション → デプロイ）。手元から出すときも `pnpm deploy:staging` / `pnpm deploy:production` でこれを使う。
+- **環境はビルド時に `CLOUDFLARE_ENV` で決まる**。`wrangler deploy --env` だけでは切り替わらない（`scripts/deploy.sh` が両方を付ける）。
 - `wrangler.jsonc` の最上位（`nishinari-next-local`）はローカル専用。本番と同じ名前にしない。
 
 ## この作業環境（Claude のクラウドセッション）での注意

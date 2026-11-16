@@ -18,7 +18,7 @@
 
 1. **Cloudflare**: Workers の有料プランに入る。D1 を2つ作る（名前は `nishinari-staging` と `nishinari-production`、場所は Asia-Pacific）。API トークンを作る（ひな形「Edit Cloudflare Workers」に D1 の編集権限を足し、対象をこのアカウントと nishinari-izakaya.net に絞る）。アカウント ID を控える
 2. **Claude に D1 の database_id を2つ伝える**（秘密情報ではない）。Claude が `wrangler.jsonc` に書く
-3. **GitHub**: environment `staging` と `production` を作り、それぞれに secret `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` を登録する。`production` の Deployment branches は main だけにする
+3. **GitHub**: environment `staging` と `production` を作り、それぞれに secret `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` を登録する。`production` の Deployment branches は main だけにする。`p1/remaining` を main に入れたあと、Actions の画面で「Deploy staging」を実行する（**デプロイは staging も本番も手動**。push では自動でデプロイしない）
 4. **GitHub**: environment `legacy-db` を作り、secret `LEGACY_DATABASE_URL` を登録する（手順は `scripts/legacy-db/README.md`）。`p1/remaining` を main に入れたあと、Actions で旧 DB の調査を実行する
 5. **Firebase**（Spark、Google ログイン、承認済みドメイン）、**Google Cloud**（Places API (New)、Maps JS、Places UI Kit。ブラウザ用キーは HTTP リファラーと API で制限する。予算アラートは任意）
 6. Google テイクアウトで保存済みリストを書き出す
@@ -30,7 +30,7 @@
 
 ### Claude の作業（準備の後）
 
-- P0: staging への空デプロイ（Cloudflare の secrets の登録後）
+- P0: staging への空デプロイ（Cloudflare の secrets の登録後。Nao が「Deploy staging」を実行し、Claude が結果を確認する）
 - P1
   - 旧 DB の調査の実行（`p1/remaining` を main に入れ、Nao が Actions で実行・承認する）と、結果の整理
   - 技術検証 d の実機確認（Firebase プロジェクトと staging が要る。`/poc/auth` でリダイレクト方式とポップアップ方式を比べる）

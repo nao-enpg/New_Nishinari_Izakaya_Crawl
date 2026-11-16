@@ -1,35 +1,26 @@
 name: CI
 
-# 前提（P0 で確認）:
-# - Cloudflare の API トークンと Account ID は、リポジトリではなく environment（staging / production）の secrets に置く。
-#   リポジトリの secrets に置くと、承認の前にどのブランチの workflow からでも使えてしまう。
-# - production environment の「Deployment branches」を main に限定する。
-# - required reviewers（承認）は、private リポジトリでは GitHub の有料プランが必要。使えない場合は、
-#   本番デプロイを Nao が手で workflow_dispatch するだけにする。
+# 検査だけを行う（型チェック・禁止パターン・テスト・ビルド）。デプロイはしない。
+# - PR と main への push で自動で動く
+# - デプロイのワークフロー（deploy-staging.yml / deploy-production.yml）からも、デプロイの前に呼ばれる（workflow_call）
 
 on:
   pull_request:
   push:
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      deploy_production:
-        description: "本番にデプロイする"
-        type: boolean
-        default: false
+  workflow_call:
 
 permissions:
   contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
-  # PR の古い実行だけを取り消す。main とデプロイは取り消さない
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    concurrency:
+      group: check-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+      # PR の古い実行だけを取り消す。main とデプロイ前の検査は取り消さない
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -47,70 +38,3 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-
-  deploy-staging:
-    needs: check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: staging
-    concurrency:
-      group: deploy-staging
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@v6.1.1
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec prisma generate
-      # 環境はビルド時に CLOUDFLARE_ENV で決まる（wrangler deploy --env だけでは切り替わらない）
-      - run: pnpm build
-        env:
-          CLOUDFLARE_ENV: staging
-      # ビルドが通ってから、マイグレーション（後方互換のもの）→ コードの順に適用する
-      - run: pnpm exec wrangler d1 migrations apply DB --env staging --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      # --env を付けておくと、ビルドした環境と食い違ったときに wrangler が止める
-      - run: pnpm exec wrangler deploy --env staging
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  deploy-production:
-    needs: check
-    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
-    concurrency:
-      group: deploy-production
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@v6.1.1
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec prisma generate
-      - run: pnpm build
-        env:
-          CLOUDFLARE_ENV: production
-      - run: pnpm exec wrangler d1 migrations apply DB --env production --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - run: pnpm exec wrangler deploy --env production
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
