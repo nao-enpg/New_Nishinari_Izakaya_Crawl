@@ -26,7 +26,7 @@
 
 決まったこと（2026-11-14）: 写真は Places UI Kit の部品をそのまま使う、日次上限は設けない、日本以外からのアクセスは止める（確認済みのボットは通す。C-017）、DNS は旧サイトのときから Cloudflare で管理している。
 
-済んだこと（2026-11-16）: nishinari-izakaya.net に WAF のカスタムルール（日本以外を Block）を設定した。**確認済みのボットを通す条件（`and not cf.client.bot`）を足す必要がある**（足さないと検索エンジンと SNS のプレビューも止まる）。staging は当面 workers.dev（Cloudflare Access で閉じる）、P6 で `staging.nishinari-izakaya.net` を付ける。Worker はダッシュボードで作らず、初回の Actions のデプロイで作る。
+済んだこと（2026-11-16）: nishinari-izakaya.net に WAF のカスタムルール（日本以外を Block）を設定した。確認済みのボットの例外は**当面付けない**（Nao の判断）。検索エンジンと SNS のプレビュー（X での共有のカードなど）も止まるので、公開（P7）の前に見直す。staging は当面 workers.dev（Cloudflare Access で閉じる）、P6 で `staging.nishinari-izakaya.net` を付ける。Worker はダッシュボードで作らず、初回の Actions のデプロイで作る。
 
 ### Claude の作業（準備の後）
 
